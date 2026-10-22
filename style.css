@@ -1,0 +1,139 @@
+/* Tải phông chữ Inter từ Google Fonts để giao diện hiện đại, tri thức */
+@import url('https://googleapis.com');
+
+/* 1. THIẾT LẬP NỀN TẢNG (Không gian thoáng đãng, dễ nhìn) */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f4f7f9; /* Nền kem nhạt dịu mắt, giảm mỏi mắt */
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+/* 2. HỘP CHỨA GAME (Bố cục tối giản, bo góc thân thiện) */
+.game-container {
+    background: #ffffff;
+    width: 100%;
+    max-width: 650px; /* Độ rộng tiêu chuẩn giúp mắt dễ quét thông tin */
+    padding: 40px;
+    border-radius: 16px; /* Bo góc nhẹ nhàng, hiện đại */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); /* Đổ bóng rất nhẹ để giao diện sạch sẽ */
+    box-sizing: border-box;
+}
+
+/* 3. TIÊU ĐỀ CÂU HỎI (Chữ to rõ, đậm nét tri thức) */
+#question {
+    font-size: 22px;
+    font-weight: 700; /* Chữ đậm, rõ ràng */
+    color: #0f172a; /* Màu chữ tối tương phản cao với nền trắng */
+    line-height: 1.6;
+    margin-top: 0;
+    margin-bottom: 30px;
+    text-align: left;
+}
+
+/* 4. KHUNG CHỨA ĐÁP ÁN (Khoảng cách thoáng đãng) */
+.options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 14px; /* Khoảng cách rộng rãi giữa các lựa chọn */
+}
+
+/* 5. CÁC NÚT ĐÁP ÁN A, B, C, D (Tinh tế, chuyên nghiệp) */
+.btn-option {
+    background-color: #ffffff;
+    color: #334155;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: left;
+    padding: 18px 24px;
+    border: 2px solid #e2e8f0; /* Đường viền mảnh sạch sẽ */
+    border-radius: 10px; /* Bo góc đồng bộ */
+    cursor: pointer;
+    line-height: 1.5;
+    transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+
+/* Hiệu ứng rê chuột - Phản hồi thị giác nhạy bén */
+.btn-option:hover:not([disabled]) {
+    border-color: #2563eb; /* Xanh dương tri thức làm chủ đạo */
+    background-color: #eff6ff; /* Nền xanh nhạt thanh lịch */
+    color: #2563eb;
+    transform: translateY(-2px); /* Nhấc nhẹ nút lên tạo cảm giác tương tác sinh động */
+}
+
+/* Trạng thái khi ĐÁP ÁN ĐÚNG */
+.btn-option[style*="background-color: rgb(154, 234, 188)"],
+.btn-option[data-correct="true"]:disabled {
+    background-color: #ecfdf5 !important; /* Xanh mint dịu mát cho câu đúng */
+    border-color: #10b981 !important;
+    color: #065f46 !important;
+    font-weight: 600;
+}
+
+/* Trạng thái khi ĐÁP ÁN SAI */
+.btn-option[style*="background-color: rgb(255, 147, 147)"] {
+    background-color: #fef2f2 !important; /* Đỏ nhạt tinh tế, không gây áp lực */
+    border-color: #ef4444 !important;
+    color: #991b1b !important;
+}
+
+.btn-option:disabled {
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+/* 6. NÚT CHUYỂN CÂU HỎI (Màu điểm nhấn Vàng/Cam Pastel truyền cảm hứng) */
+#next-btn {
+    background-color: #f59e0b; /* Màu vàng cam học thuật, nổi bật thông tin quan trọng */
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 14px 35px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin: 30px auto 0 auto;
+    display: none;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+    transition: background-color 0.2s, transform 0.15s;
+}
+
+#next-btn:hover {
+    background-color: #d97706; /* Đậm hơn một chút khi rê chuột */
+    transform: translateY(-1px);
+}
+/* Trang trí vùng đếm ngược thời gian */
+.timer-container {
+    background-color: #fef3c7; /* Nền vàng pastel dịu nhẹ */
+    color: #d97706; /* Màu chữ cam đậm nổi bật */
+    font-size: 16px;
+    font-weight: 600;
+    padding: 10px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: inline-block;
+    border: 1px solid #fde68a;
+}
+/* Khung xám bên ngoài của thanh tiến trình */
+.progress-container {
+    width: 100%;
+    height: 8px;
+    background-color: #e2e8f0; /* Màu xám nhạt */
+    border-radius: 4px;
+    margin-bottom: 20px;
+    overflow: hidden; /* Giữ phần thanh chạy bên trong không bị tràn */
+}
+
+/* Thanh màu xanh chạy bên trong tự động tăng độ dài */
+.progress-bar {
+    height: 100%;
+    width: 0%; /* Ban đầu là 0% */
+    background-color: #2563eb; /* Xanh dương tri thức chủ đạo */
+    border-radius: 4px;
+    transition: width 0.3s ease; /* Hiệu ứng tăng độ dài mượt mà */
+}
