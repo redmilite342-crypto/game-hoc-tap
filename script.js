@@ -7,7 +7,7 @@ const questionElement = document.getElementById("question");
 const optionsContainer = document.getElementById("options-container");
 const progressBar = document.getElementById("progress-bar");
 
-// 1. DỮ LIỆU CÂU HỎI (8 câu của bạn)
+// 1. DỮ LIỆU CÂU HỎI TRẮC NGHIỆM KHÔNG ĐỔI
 const questions = [
     { question: "Vì sao thực hiện trách nhiệm xã hội được xem là yếu tố góp phần phát triển bền vững của doanh nghiệp?", answers: ["Vì giúp doanh nghiệp loại bỏ hoàn toàn sự cạnh tranh trên thị trường.", "Vì giúp doanh nghiệp chỉ tập trung vào lợi ích trước mắt.", "Vì tạo dựng uy tín, củng cố niềm tin của các bên liên quan và nâng cao hiệu quả kinh doanh lâu dài.", "Vì thay thế hoàn toàn vai trò quản lí của Nhà nước."], correct: 2 },
     { question: "Một doanh nghiệp vừa đảm bảo lợi nhuận, vừa bảo vệ môi trường, tôn trọng người lao động và đóng góp cho cộng đồng cho thấy điều gì?", answers: ["Doanh nghiệp đang thực hiện trách nhiệm xã hội một cách toàn diện.", "Doanh nghiệp đang giảm khả năng cạnh tranh.", "Doanh nghiệp chỉ chú trọng hình ảnh bên ngoài.", "Doanh nghiệp không đặt mục tiêu kinh doanh."], correct: 0 },
@@ -19,116 +19,140 @@ const questions = [
     { question: "Doanh nghiệp tổ chức các hoạt động từ thiện, hỗ trợ người có hoàn cảnh khó khăn thể hiện trách nhiệm nào?", answers: ["Trách nhiệm nhân văn.", "Trách nhiệm kinh tế.", "Trách nhiệm pháp lí.", "Trách nhiệm sản xuất."], correct: 0 }
 ];
 
-// 2. BIẾN TRẠNG THÁI GAME
 let currentQuestionIndex = 0;
 let score = 0;
 let isQuizMode = false;
 let gameActive = true;
 
-// Đối tượng Con Cá bằng Đồ họa Vector
-let fish = {
-    x: 100,
-    y: 200,
-    radius: 16,
-    gravity: 0.25,
-    velocity: 0,
-    jump: -4.5
-};
+// Môi trường đồ họa nâng cấp: Tạo mảng chứa các bong bóng nước sặc sỡ rơi/bay tự do
+let bubbles = [];
+for (let i = 0; i < 25; i++) {
+    bubbles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 5 + 2,
+        speed: Math.random() * 1 + 0.5,
+        alpha: Math.random() * 0.5 + 0.2
+    });
+}
 
-// Mỏm đá chướng ngại vật chứa câu hỏi
-let obstacle = {
-    x: canvas.width + 50,
-    y: 150,
-    width: 40,
-    height: 100,
-    speed: 2.5
-};
+let fish = { x: 120, y: 200, radius: 18, gravity: 0.25, velocity: 0, jump: -4.8 };
+// Chướng ngại vật đổi màu vàng neon nổi bật sặc sỡ
+let obstacle = { x: canvas.width + 100, y: 150, width: 45, height: 110, speed: 3 };
 
-// Điều khiển cá bơi lên bằng chuột hoặc phím Cách (Space)
 window.addEventListener("keydown", (e) => { if(e.code === "Space" && !isQuizMode) fish.velocity = fish.jump; });
 canvas.addEventListener("click", () => { if(!isQuizMode) fish.velocity = fish.jump; });
 
 function update() {
     if (!gameActive || isQuizMode) return;
 
-    // Logic vật lý chuyển động rơi tự do của cá
     fish.velocity += fish.gravity;
     fish.y += fish.velocity;
 
-    // Giới hạn không cho cá bơi lệch ra khỏi màn hình đại dương
     if (fish.y + fish.radius > canvas.height) fish.y = canvas.height - fish.radius;
     if (fish.y - fish.radius < 0) fish.y = fish.radius;
 
-    // Di chuyển chướng ngại vật từ phải sang trái
     obstacle.x -= obstacle.speed;
 
-    // Kiểm tra va chạm giữa Cá và Chướng ngại vật
+    // Di chuyển các hiệu ứng hạt bong bóng nước lung linh
+    bubbles.forEach(b => {
+        b.y -= b.speed;
+        if (b.y < -10) {
+            b.y = canvas.height + 10;
+            b.x = Math.random() * canvas.width;
+        }
+    });
+
     if (obstacle.x < fish.x + fish.radius && obstacle.x + obstacle.width > fish.x - fish.radius) {
         if (fish.y + fish.radius > obstacle.y && fish.y - fish.radius < obstacle.y + obstacle.height) {
-            triggerQuiz(); // Chạm đá -> Bật bảng câu hỏi ngay lập tức
+            triggerQuiz();
         }
     }
 
-    // Nếu chướng ngại vật trôi qua màn hình mà chưa va chạm (học sinh né được)
     if (obstacle.x + obstacle.width < 0) {
         resetObstacle();
     }
 }
 
 function draw() {
-    // Xóa khung hình cũ để vẽ chuyển động mới mượt mà
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // 1. Vẽ chướng ngại vật (Mỏm đá bí ẩn chứa tri thức)
-    ctx.fillStyle = "#64748b";
-    ctx.beginPath();
-    ctx.roundRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height, 8);
-    ctx.fill();
-    // Vẽ ký hiệu "?" trên chướng ngại vật
-    ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 20px Inter";
-    ctx.fillText("?", obstacle.x + 14, obstacle.y + 55);
+    // ĐỒ HỌA NỀN: Vẽ các hạt bong bóng nước lung linh màu xanh pastel sặc sỡ
+    bubbles.forEach(b => {
+        ctx.fillStyle = `rgba(14, 165, 233, ${b.alpha})`;
+        ctx.beginPath();
+        ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+        ctx.fill();
+    });
 
-    // 2. Vẽ đồ họa Con Cá Hoạt Hình màu cam đáng yêu
-    ctx.fillStyle = "#f97316"; // Màu cam
+    // 1. VẼ CHƯỚNG NGẠI VẬT: Mỏm đá đổi sang sắc màu Tím Neon sặc sỡ phát sáng
+    ctx.fillStyle = "#a855f7";
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = "#a855f7"; // Hiệu ứng đồ họa phát sáng viền mỏm đá
+    ctx.beginPath();
+    ctx.roundRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height, 12);
+    ctx.fill();
+    
+    // Vẽ chữ "?" sặc sỡ trên mỏm đá tri thức
+    ctx.shadowBlur = 0; // Tắt phát sáng để chữ rõ ràng
+    ctx.fillStyle = "#fef08a"; // Màu vàng tươi tương phản cao
+    ctx.font = "bold 24px Inter";
+    ctx.fillText("?", obstacle.x + 16, obstacle.y + 65);
+
+    // 2. VẼ ĐỒ HỌA CHÚ CÁ CẦU VỒNG SẶC SỠ (Nâng cấp nhiều vây đẹp mắt)
+    // Thân cá màu đỏ cam sặc sỡ phát sáng neon
+    ctx.fillStyle = "#ff4757";
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = "#ff4757";
     ctx.beginPath();
     ctx.arc(fish.x, fish.y, fish.radius, 0, Math.PI * 2);
     ctx.fill();
-    // Vẽ Đuôi cá
+    ctx.shadowBlur = 0;
+
+    // Vây đuôi cá lộng lẫy màu hồng sặc sỡ rực rỡ
+    ctx.fillStyle = "#ff6b81";
     ctx.beginPath();
-    ctx.moveTo(fish.x - fish.radius, fish.y);
-    ctx.lineTo(fish.x - fish.radius - 12, fish.y - 10);
-    ctx.lineTo(fish.x - fish.radius - 12, fish.y + 10);
+    ctx.moveTo(fish.x - fish.radius + 2, fish.y);
+    ctx.quadraticCurveTo(fish.x - fish.radius - 15, fish.y - 18, fish.x - fish.radius - 20, fish.y - 15);
+    ctx.lineTo(fish.x - fish.radius - 15, fish.y);
+    ctx.lineTo(fish.x - fish.radius - 20, fish.y + 15);
+    ctx.quadraticCurveTo(fish.x - fish.radius - 15, fish.y + 18, fish.x - fish.radius + 2, fish.y);
     ctx.closePath();
     ctx.fill();
-    // Vẽ Mắt cá tròn xoe xinh xắn
+
+    // Vây lưng màu vàng chanh sặc sỡ tăng tính bắt mắt
+    ctx.fillStyle = "#eccc68";
+    ctx.beginPath();
+    ctx.moveTo(fish.x - 5, fish.y - fish.radius + 2);
+    ctx.quadraticCurveTo(fish.x - 12, fish.y - fish.radius - 10, fish.x - 18, fish.y - fish.radius + 4);
+    ctx.fill();
+
+    // Mắt cá to tròn long lanh tri thức
     ctx.fillStyle = "#ffffff";
     ctx.beginPath();
-    ctx.arc(fish.x + 6, fish.y - 4, 4, 0, Math.PI * 2);
+    ctx.arc(fish.x + 6, fish.y - 4, 4.5, 0, Math.PI * 2);
     ctx.fill();
-    ctx.fillStyle = "#000000";
+    ctx.fillStyle = "#2f3542";
     ctx.beginPath();
-    ctx.arc(fish.x + 7, fish.y - 4, 1.5, 0, Math.PI * 2);
+    ctx.arc(fish.x + 7.5, fish.y - 4, 2, 0, Math.PI * 2);
     ctx.fill();
 }
 
 function gameLoop() {
     update();
     draw();
-    requestAnimationFrame(gameLoop); // Tạo vòng lặp đồ họa 60 khung hình/giây
+    requestAnimationFrame(gameLoop);
 }
 
 function resetObstacle() {
-    obstacle.x = canvas.width + Math.random() * 200 + 100;
-    obstacle.y = Math.random() * (canvas.height - 150) + 25; // Đổi ngẫu nhiên chiều cao mỏm đá
+    obstacle.x = canvas.width + Math.random() * 250 + 100;
+    obstacle.y = Math.random() * (canvas.height - 160) + 25;
 }
 
-// Hàm kích hoạt hiển thị câu hỏi trắc nghiệm
 function triggerQuiz() {
     isQuizMode = true;
     quizBox.style.display = "block";
     
-    // Cập nhật thanh tiến trình chạy từ 1 đến 8 câu
     const progressPercent = ((currentQuestionIndex + 1) / questions.length) * 100;
     progressBar.style.width = `${progressPercent}%`;
 
@@ -147,57 +171,34 @@ function triggerQuiz() {
 
 function checkAnswer(selectedIndex, correctIndex) {
     const buttons = optionsContainer.getElementsByTagName("button");
-    
-    // Khóa nút bấm
     for (let btn of buttons) btn.disabled = true;
 
     if (selectedIndex === correctIndex) {
-        buttons[selectedIndex].style.backgroundColor = "#ecfdf5";
+        buttons[selectedIndex].style.backgroundColor = "#d1fae5";
         buttons[selectedIndex].style.borderColor = "#10b981";
         buttons[selectedIndex].style.color = "#065f46";
         score++;
-        // Đồ họa pháo hoa rực rỡ khi trả lời đúng xuất sắc
-        confetti({ particleCount: 80, spread: 60, origin: { y: 0.6 } });
+        confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
     } else {
-        buttons[selectedIndex].style.backgroundColor = "#fef2f2";
+        buttons[selectedIndex].style.backgroundColor = "#fee2e2";
         buttons[selectedIndex].style.borderColor = "#ef4444";
         buttons[selectedIndex].style.color = "#991b1b";
-        // Hiện đáp án đúng màu xanh lá
-        buttons[correctIndex].style.backgroundColor = "#ecfdf5";
+        buttons[correctIndex].style.backgroundColor = "#d1fae5";
         buttons[correctIndex].style.borderColor = "#10b981";
     }
 
-    // Đợi 1.5 giây để học sinh nhìn nhận đáp án rồi tự động bơi tiếp câu tiếp theo
     setTimeout(() => {
         quizBox.style.display = "none";
         currentQuestionIndex++;
         
         if (currentQuestionIndex < questions.length) {
             resetObstacle();
-            isQuizMode = false; // Cá tiếp tục bơi đi tìm đá mới
+            isQuizMode = false;
         } else {
             endGame();
         }
-    }, 1500);
+    }, 1600);
 }
 
 function endGame() {
     gameActive = false;
-    quizBox.style.display = "none";
-    endScreen.style.display = "block";
-    document.getElementById("end-score").innerHTML = `Bạn đã giúp Cá Vàng vượt qua tất cả chướng ngại vật đại dương! <br>Số điểm tri thức đạt được: <strong>${score}/${questions.length}</strong>`;
-}
-
-function resetGame() {
-    currentQuestionIndex = 0;
-    score = 0;
-    fish.y = 200;
-    fish.velocity = 0;
-    resetObstacle();
-    endScreen.style.display = "none";
-    isQuizMode = false;
-    gameActive = true;
-}
-
-// Khởi chạy vòng lặp đồ họa chính của trò chơi ngay khi tải trang
-gameLoop();
