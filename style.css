@@ -1,139 +1,113 @@
-/* Tải phông chữ Inter từ Google Fonts để giao diện hiện đại, tri thức */
 @import url('https://googleapis.com');
 
-/* 1. THIẾT LẬP NỀN TẢNG (Không gian thoáng đãng, dễ nhìn) */
 body {
     font-family: 'Inter', sans-serif;
-    background-color: #f4f7f9; /* Nền kem nhạt dịu mắt, giảm mỏi mắt */
+    background-color: #0f172a;
     margin: 0;
-    padding: 20px;
+    padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
-    box-sizing: border-box;
+    height: 100vh;
+    overflow: hidden;
 }
 
-/* 2. HỘP CHỨA GAME (Bố cục tối giản, bo góc thân thiện) */
-.game-container {
-    background: #ffffff;
-    width: 100%;
-    max-width: 650px; /* Độ rộng tiêu chuẩn giúp mắt dễ quét thông tin */
-    padding: 40px;
-    border-radius: 16px; /* Bo góc nhẹ nhàng, hiện đại */
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); /* Đổ bóng rất nhẹ để giao diện sạch sẽ */
-    box-sizing: border-box;
+.game-wrapper {
+    position: relative;
+    width: 800px;
+    height: 400px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    border-radius: 12px;
+    overflow: hidden;
 }
 
-/* 3. TIÊU ĐỀ CÂU HỎI (Chữ to rõ, đậm nét tri thức) */
+/* Khung đồ họa vẽ cá bơi */
+#gameCanvas {
+    background: linear-gradient(to bottom, #1e3a8a, #0f172a); /* Nền đại dương sâu thẳm */
+    display: block;
+}
+
+/* Hộp trắc nghiệm đè lên màn hình game khi va chạm */
+.quiz-container, .end-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.95);
+    width: 85%;
+    max-width: 550px;
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    backdrop-filter: blur(4px);
+    box-sizing: border-box;
+    animation: zoomIn 0.3s ease;
+}
+
+@keyframes zoomIn {
+    from { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+    to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+
 #question {
-    font-size: 22px;
-    font-weight: 700; /* Chữ đậm, rõ ràng */
-    color: #0f172a; /* Màu chữ tối tương phản cao với nền trắng */
-    line-height: 1.6;
-    margin-top: 0;
-    margin-bottom: 30px;
-    text-align: left;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 20px;
+    line-height: 1.5;
 }
 
-/* 4. KHUNG CHỨA ĐÁP ÁN (Khoảng cách thoáng đãng) */
 .options-container {
     display: flex;
     flex-direction: column;
-    gap: 14px; /* Khoảng cách rộng rãi giữa các lựa chọn */
+    gap: 10px;
 }
 
-/* 5. CÁC NÚT ĐÁP ÁN A, B, C, D (Tinh tế, chuyên nghiệp) */
 .btn-option {
     background-color: #ffffff;
     color: #334155;
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 500;
     text-align: left;
-    padding: 18px 24px;
-    border: 2px solid #e2e8f0; /* Đường viền mảnh sạch sẽ */
-    border-radius: 10px; /* Bo góc đồng bộ */
-    cursor: pointer;
-    line-height: 1.5;
-    transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
-}
-
-/* Hiệu ứng rê chuột - Phản hồi thị giác nhạy bén */
-.btn-option:hover:not([disabled]) {
-    border-color: #2563eb; /* Xanh dương tri thức làm chủ đạo */
-    background-color: #eff6ff; /* Nền xanh nhạt thanh lịch */
-    color: #2563eb;
-    transform: translateY(-2px); /* Nhấc nhẹ nút lên tạo cảm giác tương tác sinh động */
-}
-
-/* Trạng thái khi ĐÁP ÁN ĐÚNG */
-.btn-option[style*="background-color: rgb(154, 234, 188)"],
-.btn-option[data-correct="true"]:disabled {
-    background-color: #ecfdf5 !important; /* Xanh mint dịu mát cho câu đúng */
-    border-color: #10b981 !important;
-    color: #065f46 !important;
-    font-weight: 600;
-}
-
-/* Trạng thái khi ĐÁP ÁN SAI */
-.btn-option[style*="background-color: rgb(255, 147, 147)"] {
-    background-color: #fef2f2 !important; /* Đỏ nhạt tinh tế, không gây áp lực */
-    border-color: #ef4444 !important;
-    color: #991b1b !important;
-}
-
-.btn-option:disabled {
-    cursor: not-allowed;
-    opacity: 0.8;
-}
-
-/* 6. NÚT CHUYỂN CÂU HỎI (Màu điểm nhấn Vàng/Cam Pastel truyền cảm hứng) */
-#next-btn {
-    background-color: #f59e0b; /* Màu vàng cam học thuật, nổi bật thông tin quan trọng */
-    color: #ffffff;
-    font-size: 16px;
-    font-weight: 600;
-    padding: 14px 35px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    margin: 30px auto 0 auto;
-    display: none;
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
-    transition: background-color 0.2s, transform 0.15s;
-}
-
-#next-btn:hover {
-    background-color: #d97706; /* Đậm hơn một chút khi rê chuột */
-    transform: translateY(-1px);
-}
-/* Trang trí vùng đếm ngược thời gian */
-.timer-container {
-    background-color: #fef3c7; /* Nền vàng pastel dịu nhẹ */
-    color: #d97706; /* Màu chữ cam đậm nổi bật */
-    font-size: 16px;
-    font-weight: 600;
-    padding: 10px 20px;
+    padding: 12px 18px;
+    border: 2px solid #e2e8f0;
     border-radius: 8px;
-    margin-bottom: 20px;
-    display: inline-block;
-    border: 1px solid #fde68a;
+    cursor: pointer;
+    transition: all 0.15s;
 }
-/* Khung xám bên ngoài của thanh tiến trình */
+
+.btn-option:hover:not([disabled]) {
+    border-color: #2563eb;
+    background-color: #eff6ff;
+    color: #2563eb;
+}
+
+/* Thanh tiến trình mini */
 .progress-container {
     width: 100%;
-    height: 8px;
-    background-color: #e2e8f0; /* Màu xám nhạt */
-    border-radius: 4px;
-    margin-bottom: 20px;
-    overflow: hidden; /* Giữ phần thanh chạy bên trong không bị tràn */
+    height: 6px;
+    background-color: #e2e8f0;
+    border-radius: 3px;
+    margin-bottom: 15px;
+    overflow: hidden;
 }
 
-/* Thanh màu xanh chạy bên trong tự động tăng độ dài */
 .progress-bar {
     height: 100%;
-    width: 0%; /* Ban đầu là 0% */
-    background-color: #2563eb; /* Xanh dương tri thức chủ đạo */
-    border-radius: 4px;
-    transition: width 0.3s ease; /* Hiệu ứng tăng độ dài mượt mà */
+    width: 0%;
+    background-color: #2563eb;
+    transition: width 0.3s;
+}
+
+/* Nút chơi lại màn hình cuối */
+#restart-btn {
+    background-color: #f59e0b;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 15px;
 }

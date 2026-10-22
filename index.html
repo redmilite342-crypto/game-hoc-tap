@@ -3,43 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Trắc Nghiệm Học Tập</title>
+    <title>Cá Con Vượt Đại Dương - Học Tập</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Thư viện bắn pháo hoa khi thắng -->
+    <script src="https://jsdelivr.net"></script>
 </head>
 <body>
 
-    <    <div class="game-container">
-        <!-- CHÈN THÊM ĐOẠN NÀY: Vùng hiển thị thanh tiến trình -->
-        <div class="progress-container">
-            <div class="progress-bar" id="progress-bar"></div>
+    <!-- Màn hình chính của Game -->
+    <div class="game-wrapper">
+        <!-- Khu vực vẽ đồ họa chuyển động chuyển cảnh của Cá -->
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+
+        <!-- Hộp câu hỏi trắc nghiệm (Mặc định ẩn, chỉ hiện khi chạm chướng ngại vật) -->
+        <div id="quiz-box" class="quiz-container" style="display: none;">
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            <h2 id="question">Câu hỏi trắc nghiệm?</h2>
+            <div class="options-container" id="options-container"></div>
         </div>
 
-        <!-- Vùng hiển thị đếm ngược (đã làm ở bước trước) -->
-        <div class="timer-container">
-            ⏱️ Thời gian còn lại: <span id="time-left">20</span> giây
+        <!-- Màn hình kết thúc/Bắt đầu lại -->
+        <div id="end-screen" class="end-container" style="display: none;">
+            <h1 id="end-title">Chúc mừng bạn!</h1>
+            <p id="end-score"></p>
+            <button id="restart-btn" onclick="resetGame()">Chơi lại từ đầu</button>
         </div>
-div class="game-container">
-        <!-- Vùng hiển thị câu hỏi -->
-        <    <div class="game-container">
-        <!-- CHÈN THÊM ĐOẠN NÀY: Vùng hiển thị đếm ngược -->
-        <div class="timer-container">
-            ⏱️ Thời gian còn lại: <span id="time-left">20</span> giây
-        </div>
-
-        <!-- Vùng hiển thị câu hỏi -->
-        <h2 id="question">Câu hỏi sẽ hiển thị ở đây?</h2>
-h2 id="question">Câu hỏi sẽ hiển thị ở đây?</h2>
-        
-        <!-- Vùng chứa 4 đáp án -->
-        <div class="options-container">
-            <button class="btn-option">Đáp án A</button>
-            <button class="btn-option">Đáp án B</button>
-            <button class="btn-option">Đáp án C</button>
-            <button class="btn-option">Đáp án D</button>
-        </div>
-
-        <!-- Nút chuyển câu -->
-        <button id="next-btn" style="margin-top: 20px;">Câu tiếp theo</button>
     </div>
 
     <script src="script.js"></script>
