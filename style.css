@@ -2,7 +2,6 @@
 
 body {
     font-family: 'Inter', sans-serif;
-    /* Nền Gradient đại dương sặc sỡ chuyển từ xanh tím sang hồng neon cực bắt mắt */
     background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
     margin: 0;
     padding: 0;
@@ -17,27 +16,29 @@ body {
     position: relative;
     width: 800px;
     height: 400px;
-    box-shadow: 0 25px 60px rgba(244, 63, 94, 0.2); /* Đổ bóng hiệu ứng neon hồng */
+    box-shadow: 0 25px 60px rgba(244, 63, 94, 0.2);
     border-radius: 16px;
     overflow: hidden;
-    border: 3px solid #f43f5e; /* Viền hồng sặc sỡ bao quanh game */
+    border: 3px solid #f43f5e;
 }
 
 #gameCanvas {
-    background: linear-gradient(to bottom, #0284c7, #0f172a); /* Nền biển xanh ngọc bích */
+    background: linear-gradient(to bottom, #0284c7, #0f172a);
     display: block;
 }
 
-/* Hộp trắc nghiệm tinh tế, nổi bật */
+/* SỬA ĐỔI QUAN TRỌNG: Bật tính năng cuộn nội dung trên điện thoại */
 .quiz-container, .end-container {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background: rgba(255, 255, 255, 0.98);
-    width: 85%;
+    width: 90%;
     max-width: 550px;
-    padding: 30px;
+    max-height: 85%; /* Giới hạn chiều cao hộp bằng 85% màn hình */
+    overflow-y: auto; /* Tự động hiện thanh cuộn vuốt xuống nếu thiếu chỗ */
+    padding: 25px;
     border-radius: 20px;
     box-shadow: 0 20px 40px rgba(0,0,0,0.4);
     box-sizing: border-box;
@@ -50,38 +51,56 @@ body {
 }
 
 #question {
-    font-size: 19px;
+    font-size: 17px;
     font-weight: 700;
     color: #0f172a;
-    margin-bottom: 20px;
-    line-height: 1.6;
+    margin-bottom: 15px;
+    line-height: 1.5;
 }
 
 .options-container {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
+    margin-bottom: 15px;
 }
 
 .btn-option {
     background-color: #ffffff;
     color: #334155;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
     text-align: left;
-    padding: 14px 20px;
+    padding: 12px 16px;
     border: 2px solid #e2e8f0;
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.2s;
 }
 
-/* Rê chuột vào đáp án đổi màu sắc neon cực đẹp */
 .btn-option:hover:not([disabled]) {
     border-color: #ec4899;
     background-color: #fdf2f8;
     color: #ec4899;
-    transform: scale(1.02);
+}
+
+/* THÊM MỚI: Thiết kế phong cách cho nút Qua câu tiếp theo */
+#next-question-btn {
+    background: linear-gradient(to right, #2563eb, #3b82f6);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    width: 100%;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    transition: background 0.2s;
+}
+
+#next-question-btn:hover {
+    background: #1d4ed8;
 }
 
 .progress-container {
@@ -89,14 +108,14 @@ body {
     height: 8px;
     background-color: #e2e8f0;
     border-radius: 4px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     overflow: hidden;
 }
 
 .progress-bar {
     height: 100%;
     width: 0%;
-    background: linear-gradient(to right, #3b82f6, #ec4899); /* Thanh tiến trình đổi màu sặc sỡ */
+    background: linear-gradient(to right, #3b82f6, #ec4899);
 }
 
 #restart-btn {
@@ -109,5 +128,4 @@ body {
     border-radius: 12px;
     cursor: pointer;
     margin-top: 15px;
-    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
 }

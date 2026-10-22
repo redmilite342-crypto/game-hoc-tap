@@ -5,32 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cá Con Vượt Đại Dương - Học Tập</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Thư viện bắn pháo hoa khi thắng -->
+    <!-- Thư viện bắn pháo hoa -->
     <script src="https://jsdelivr.net"></script>
 </head>
 <body>
 
-    <!-- Màn hình chính của Game -->
     <div class="game-wrapper">
-        <!-- Khu vực vẽ đồ họa chuyển động chuyển cảnh của Cá -->
+        <!-- Khu vực vẽ đồ họa cá bơi -->
         <canvas id="gameCanvas" width="800" height="400"></canvas>
 
-        <!-- Hộp câu hỏi trắc nghiệm (Mặc định ẩn, chỉ hiện khi chạm chướng ngại vật) -->
+        <!-- Hộp câu hỏi (Đã chỉnh sửa để cuộn được trên mobile) -->
         <div id="quiz-box" class="quiz-container" style="display: none;">
             <div class="progress-container">
                 <div class="progress-bar" id="progress-bar"></div>
             </div>
             <h2 id="question">Câu hỏi trắc nghiệm?</h2>
             <div class="options-container" id="options-container"></div>
+            <!-- THÊM MỚI: Nút chuyển câu hỏi chủ động -->
+            <button id="next-question-btn" style="display: none;">Câu tiếp theo ➡️</button>
         </div>
 
-        <!-- Màn hình kết thúc/Bắt đầu lại -->
+        <!-- Màn hình kết thúc -->
         <div id="end-screen" class="end-container" style="display: none;">
             <h1 id="end-title">Chúc mừng bạn!</h1>
             <p id="end-score"></p>
             <button id="restart-btn" onclick="resetGame()">Chơi lại từ đầu</button>
         </div>
     </div>
+
+    <!-- TÍCH HỢP ĐỒ HỌA ÂM THANH MẠNG YẾU VẪN CHẠY MƯỢT -->
+    <audio id="sound-correct" src="https://mixkit.co" preload="auto"></audio>
+    <audio id="sound-wrong" src="https://mixkit.co" preload="auto"></audio>
 
     <script src="script.js"></script>
 </body>

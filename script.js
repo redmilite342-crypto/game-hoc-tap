@@ -6,8 +6,12 @@ const endScreen = document.getElementById("end-screen");
 const questionElement = document.getElementById("question");
 const optionsContainer = document.getElementById("options-container");
 const progressBar = document.getElementById("progress-bar");
+const nextQuestionBtn = document.getElementById("next-question-btn");
 
-// 1. DỮ LIỆU CÂU HỎI TRẮC NGHIỆM KHÔNG ĐỔI
+// Âm thanh phần cứng hệ thống web
+const soundCorrect = document.getElementById("sound-correct");
+const soundWrong = document.getElementById("sound-wrong");
+
 const questions = [
     { question: "Vì sao thực hiện trách nhiệm xã hội được xem là yếu tố góp phần phát triển bền vững của doanh nghiệp?", answers: ["Vì giúp doanh nghiệp loại bỏ hoàn toàn sự cạnh tranh trên thị trường.", "Vì giúp doanh nghiệp chỉ tập trung vào lợi ích trước mắt.", "Vì tạo dựng uy tín, củng cố niềm tin của các bên liên quan và nâng cao hiệu quả kinh doanh lâu dài.", "Vì thay thế hoàn toàn vai trò quản lí của Nhà nước."], correct: 2 },
     { question: "Một doanh nghiệp vừa đảm bảo lợi nhuận, vừa bảo vệ môi trường, tôn trọng người lao động và đóng góp cho cộng đồng cho thấy điều gì?", answers: ["Doanh nghiệp đang thực hiện trách nhiệm xã hội một cách toàn diện.", "Doanh nghiệp đang giảm khả năng cạnh tranh.", "Doanh nghiệp chỉ chú trọng hình ảnh bên ngoài.", "Doanh nghiệp không đặt mục tiêu kinh doanh."], correct: 0 },
@@ -24,7 +28,6 @@ let score = 0;
 let isQuizMode = false;
 let gameActive = true;
 
-// Môi trường đồ họa nâng cấp: Tạo mảng chứa các bong bóng nước sặc sỡ rơi/bay tự do
 let bubbles = [];
 for (let i = 0; i < 25; i++) {
     bubbles.push({
@@ -37,7 +40,6 @@ for (let i = 0; i < 25; i++) {
 }
 
 let fish = { x: 120, y: 200, radius: 18, gravity: 0.25, velocity: 0, jump: -4.8 };
-// Chướng ngại vật đổi màu vàng neon nổi bật sặc sỡ
 let obstacle = { x: canvas.width + 100, y: 150, width: 45, height: 110, speed: 3 };
 
 window.addEventListener("keydown", (e) => { if(e.code === "Space" && !isQuizMode) fish.velocity = fish.jump; });
@@ -54,7 +56,6 @@ function update() {
 
     obstacle.x -= obstacle.speed;
 
-    // Di chuyển các hiệu ứng hạt bong bóng nước lung linh
     bubbles.forEach(b => {
         b.y -= b.speed;
         if (b.y < -10) {
@@ -77,7 +78,6 @@ function update() {
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // ĐỒ HỌA NỀN: Vẽ các hạt bong bóng nước lung linh màu xanh pastel sặc sỡ
     bubbles.forEach(b => {
         ctx.fillStyle = `rgba(14, 165, 233, ${b.alpha})`;
         ctx.beginPath();
@@ -85,22 +85,18 @@ function draw() {
         ctx.fill();
     });
 
-    // 1. VẼ CHƯỚNG NGẠI VẬT: Mỏm đá đổi sang sắc màu Tím Neon sặc sỡ phát sáng
     ctx.fillStyle = "#a855f7";
     ctx.shadowBlur = 15;
-    ctx.shadowColor = "#a855f7"; // Hiệu ứng đồ họa phát sáng viền mỏm đá
+    ctx.shadowColor = "#a855f7";
     ctx.beginPath();
     ctx.roundRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height, 12);
     ctx.fill();
     
-    // Vẽ chữ "?" sặc sỡ trên mỏm đá tri thức
-    ctx.shadowBlur = 0; // Tắt phát sáng để chữ rõ ràng
-    ctx.fillStyle = "#fef08a"; // Màu vàng tươi tương phản cao
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = "#fef08a";
     ctx.font = "bold 24px Inter";
     ctx.fillText("?", obstacle.x + 16, obstacle.y + 65);
 
-    // 2. VẼ ĐỒ HỌA CHÚ CÁ CẦU VỒNG SẶC SỠ (Nâng cấp nhiều vây đẹp mắt)
-    // Thân cá màu đỏ cam sặc sỡ phát sáng neon
     ctx.fillStyle = "#ff4757";
     ctx.shadowBlur = 10;
     ctx.shadowColor = "#ff4757";
@@ -109,7 +105,6 @@ function draw() {
     ctx.fill();
     ctx.shadowBlur = 0;
 
-    // Vây đuôi cá lộng lẫy màu hồng sặc sỡ rực rỡ
     ctx.fillStyle = "#ff6b81";
     ctx.beginPath();
     ctx.moveTo(fish.x - fish.radius + 2, fish.y);
@@ -120,14 +115,12 @@ function draw() {
     ctx.closePath();
     ctx.fill();
 
-    // Vây lưng màu vàng chanh sặc sỡ tăng tính bắt mắt
     ctx.fillStyle = "#eccc68";
     ctx.beginPath();
     ctx.moveTo(fish.x - 5, fish.y - fish.radius + 2);
     ctx.quadraticCurveTo(fish.x - 12, fish.y - fish.radius - 10, fish.x - 18, fish.y - fish.radius + 4);
     ctx.fill();
 
-    // Mắt cá to tròn long lanh tri thức
     ctx.fillStyle = "#ffffff";
     ctx.beginPath();
     ctx.arc(fish.x + 6, fish.y - 4, 4.5, 0, Math.PI * 2);
@@ -152,6 +145,7 @@ function resetObstacle() {
 function triggerQuiz() {
     isQuizMode = true;
     quizBox.style.display = "block";
+    nextQuestionBtn.style.display = "none"; // Ẩn nút đi cho đến khi chọn đáp án
     
     const progressPercent = ((currentQuestionIndex + 1) / questions.length) * 100;
     progressBar.style.width = `${progressPercent}%`;
@@ -178,6 +172,9 @@ function checkAnswer(selectedIndex, correctIndex) {
         buttons[selectedIndex].style.borderColor = "#10b981";
         buttons[selectedIndex].style.color = "#065f46";
         score++;
+        
+        // PHÁT ÂM THANH ĐÚNG VÀ PHÁO HOA
+        soundCorrect.play();
         confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
     } else {
         buttons[selectedIndex].style.backgroundColor = "#fee2e2";
@@ -185,20 +182,29 @@ function checkAnswer(selectedIndex, correctIndex) {
         buttons[selectedIndex].style.color = "#991b1b";
         buttons[correctIndex].style.backgroundColor = "#d1fae5";
         buttons[correctIndex].style.borderColor = "#10b981";
+        
+        // PHÁT ÂM THANH SAI
+        soundWrong.play();
     }
 
-    setTimeout(() => {
-        quizBox.style.display = "none";
-        currentQuestionIndex++;
-        
-        if (currentQuestionIndex < questions.length) {
-            resetObstacle();
-            isQuizMode = false;
-        } else {
-            endGame();
-        }
-    }, 1600);
+    // Hiện nút "Câu tiếp theo" để học sinh chủ động bấm qua câu mới
+    nextQuestionBtn.style.display = "block";
 }
+
+// Lắng nghe sự kiện click vào nút qua câu tiếp theo
+nextQuestionBtn.onclick = () => {
+    quizBox.style.display = "none";
+    currentQuestionIndex++;
+    
+    if (currentQuestionIndex < questions.length) {
+        resetObstacle();
+        isQuizMode = false; // Cá bơi tiếp
+    } else {
+        endGame();
+    }
+};
 
 function endGame() {
     gameActive = false;
+    quizBox.style.display = "none";
+    endScreen.style.display = "block";
