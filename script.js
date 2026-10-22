@@ -2,13 +2,13 @@ const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 
 const quizBox = document.getElementById("quiz-box");
+const startScreen = document.getElementById("start-screen");
 const endScreen = document.getElementById("end-screen");
 const questionElement = document.getElementById("question");
 const optionsContainer = document.getElementById("options-container");
 const progressBar = document.getElementById("progress-bar");
 const nextQuestionBtn = document.getElementById("next-question-btn");
 
-// Âm thanh phần cứng hệ thống web
 const soundCorrect = document.getElementById("sound-correct");
 const soundWrong = document.getElementById("sound-wrong");
 
@@ -26,7 +26,7 @@ const questions = [
 let currentQuestionIndex = 0;
 let score = 0;
 let isQuizMode = false;
-let gameActive = true;
+let gameActive = false;
 
 let bubbles = [];
 for (let i = 0; i < 25; i++) {
@@ -42,8 +42,14 @@ for (let i = 0; i < 25; i++) {
 let fish = { x: 120, y: 200, radius: 18, gravity: 0.25, velocity: 0, jump: -4.8 };
 let obstacle = { x: canvas.width + 100, y: 150, width: 45, height: 110, speed: 3 };
 
-window.addEventListener("keydown", (e) => { if(e.code === "Space" && !isQuizMode) fish.velocity = fish.jump; });
-canvas.addEventListener("click", () => { if(!isQuizMode) fish.velocity = fish.jump; });
+window.addEventListener("keydown", (e) => { if(e.code === "Space" && !isQuizMode && gameActive) fish.velocity = fish.jump; });
+canvas.addEventListener("click", () => { if(!isQuizMode && gameActive) fish.velocity = fish.jump; });
+
+function realStartGame() {
+    startScreen.style.display = "none";
+    gameActive = true;
+    resetObstacle();
+}
 
 function update() {
     if (!gameActive || isQuizMode) return;
@@ -138,14 +144,14 @@ function gameLoop() {
 }
 
 function resetObstacle() {
-    obstacle.x = canvas.width + Math.random() * 250 + 100;
+    obstacle.x = canvas.width + Math.random() * 250 + 150;
     obstacle.y = Math.random() * (canvas.height - 160) + 25;
 }
 
 function triggerQuiz() {
     isQuizMode = true;
     quizBox.style.display = "block";
-    nextQuestionBtn.style.display = "none"; // Ẩn nút đi cho đến khi chọn đáp án
+    nextQuestionBtn.style.display = "none";
     
     const progressPercent = ((currentQuestionIndex + 1) / questions.length) * 100;
     progressBar.style.width = `${progressPercent}%`;
@@ -173,8 +179,7 @@ function checkAnswer(selectedIndex, correctIndex) {
         buttons[selectedIndex].style.color = "#065f46";
         score++;
         
-        // PHÁT ÂM THANH ĐÚNG VÀ PHÁO HOA
-        soundCorrect.play();
+        try { soundCorrect.play(); } catch(e){}
         confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
     } else {
         buttons[selectedIndex].style.backgroundColor = "#fee2e2";
@@ -183,22 +188,19 @@ function checkAnswer(selectedIndex, correctIndex) {
         buttons[correctIndex].style.backgroundColor = "#d1fae5";
         buttons[correctIndex].style.borderColor = "#10b981";
         
-        // PHÁT ÂM THANH SAI
-        soundWrong.play();
+        try { soundWrong.play(); } catch(e){}
     }
 
-    // Hiện nút "Câu tiếp theo" để học sinh chủ động bấm qua câu mới
     nextQuestionBtn.style.display = "block";
 }
 
-// Lắng nghe sự kiện click vào nút qua câu tiếp theo
 nextQuestionBtn.onclick = () => {
     quizBox.style.display = "none";
     currentQuestionIndex++;
     
     if (currentQuestionIndex < questions.length) {
         resetObstacle();
-        isQuizMode = false; // Cá bơi tiếp
+        isQuizMode = false;
     } else {
         endGame();
     }
@@ -208,3 +210,6 @@ function endGame() {
     gameActive = false;
     quizBox.style.display = "none";
     endScreen.style.display = "block";
+    document.getElementById("end-score").innerHTML = `Bạn đã xuất sắc giúp chú cá cầu vồng vượt đại dương! <br>Số điểm đạt được: <strong>${score}/${questions.length}</strong>`;
+}
+
